@@ -3,11 +3,11 @@ from flask_cors import CORS
 import json,sys,configparser
 from flask_sqlalchemy import SQLAlchemy
 from gevent import pywsgi
-
+import os
 config = configparser.ConfigParser()
-config.read('config.dev.ini', encoding='utf-8')
+config_file = os.environ.get('CONFIG_FILE', 'config.prod.ini')
+config.read(config_file, encoding='utf-8')
 
-#initialize frame
 app = Flask(__name__)
 #browser security protocal
 CORS(app, supports_credentials=True)
