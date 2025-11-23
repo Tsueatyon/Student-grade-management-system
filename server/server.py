@@ -3,9 +3,10 @@ from flask_cors import CORS
 import json,sys,configparser
 from flask_sqlalchemy import SQLAlchemy
 from gevent import pywsgi
+
 import os
 config = configparser.ConfigParser()
-config_file = os.environ.get('CONFIG_FILE', 'config.prod.ini')
+config_file = os.environ.get('CONFIG_FILE', 'config.dev.ini')
 config.read(config_file, encoding='utf-8')
 
 app = Flask(__name__)
