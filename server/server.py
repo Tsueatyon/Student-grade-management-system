@@ -6,7 +6,7 @@ from gevent import pywsgi
 
 import os
 config = configparser.ConfigParser()
-config_file = os.environ.get('CONFIG_FILE', 'config.dev.ini')
+config_file = os.environ.get('CONFIG_FILE', 'config.prod.ini')
 config.read(config_file, encoding='utf-8')
 
 app = Flask(__name__)
@@ -33,7 +33,7 @@ def after_request(resp):
 
 @app.before_request
 def before_request():
-    if request.path=='/login' :
+    if request.path in ['/login', '/api/login']:
         return None
     if request.cookies.get('id') is None:
         return response(999,'please re-login')
@@ -184,7 +184,7 @@ def logout():
     resp.delete_cookie('id')
     return resp
 
-def response(code,message,data:any=None):
+def response(code,message,data = None):
     res={'code':code,'message':message,'data':{}}
     if data is not None:
         if hasattr(data,'__dict__'):
