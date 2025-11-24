@@ -3,7 +3,7 @@ from flask_cors import CORS
 import json,sys,configparser
 from flask_sqlalchemy import SQLAlchemy
 from gevent import pywsgi
-
+from sqlalchemy import text
 import os
 config = configparser.ConfigParser()
 config_file = os.environ.get('CONFIG_FILE', 'config.prod.ini')
@@ -33,10 +33,10 @@ def after_request(resp):
 
 @app.before_request
 def before_request():
-    if request.path in ['/login', '/api/login']:
+    if request.path == '/login':
         return None
     if request.cookies.get('id') is None:
-        return response(999,'please re-login')
+        return response(999,f"Please re-login. Path: {request.path}")
     return None
 
 @app.route('/teacher_lists',methods=['Get'] )
@@ -151,32 +151,53 @@ def deletedata(list,id):
             del list[i]
             return
     return
-#search in sql
-def query(sql,param=None):
-    ress=mysql.session.execute(sql,param)
-    data=[dict(zip(result.keys(),result)) for result in ress]
-    return data
 
-#write in sql
-def execute(sql,param=None):
-    result=mysql.session.execute(sql,param)
-    mysql.session.commit()
-    return result
-@app.route('/login',methods=['POST'] )
+def query(sql, param=None):
+    if param is None:
+        param = {}
+    with mysql.session() as session:
+        result = session.execute(text(sql), param)
+        if result.returns_rows:
+            # ←←← THIS IS THE CORRECT WAY IN SQLAlchemy 2.0+
+            return [dict(row._mapping) for row in result]
+        return []
+
+
+def execute(sql, param=None):
+    if param is None:
+        param = {}
+    with mysql.session() as session:
+        session.execute(text(sql), param)
+        session.commit()
+@app.route('/login', methods=['POST'])
 def login():
+    try:
+        param = json.loads(request.data)
+    except:
+        return response(1, 'invalid json')
 
-    param=json.loads(request.data)
-    if 'name' not in param:
-        return response(1000,'enter your name')
-    if 'password' not in param:
-        return response(1001,'enter your password')
-    sql="SELECT * FROM `teachers` WHERE name=:name"
-    ret=query(sql,{'name':param['name']})
-    if len(ret)>0 and ret[0]['password']==param['password']:
-        resp = response(0, 'ok', {'id':ret[0]['id'], 'name': ret[0]['name']})
-        resp.set_cookie('id',str(ret[0]['id']), max_age=3600)
+    name = param.get('name', '').strip()
+    password = param.get('password', '').strip()
+
+    if not name or not password:
+        return response(1000, 'username and password required')
+
+    sql = "SELECT id, name, password FROM teachers WHERE name = :name"
+    ret = query(sql, {'name': name})
+
+    if ret and ret[0]['password'] == password:
+        resp = response(0, 'login success', {'id': ret[0]['id'], 'name': ret[0]['name']})
+        resp.set_cookie(
+            'id',
+            str(ret[0]['id']),
+            max_age=3600,
+            path='/',
+            httponly=False,
+            samesite='Lax'
+        )
         return resp
-    return response(2000,'unauthorized')
+
+    return response(2000, 'wrong username or password')
 
 @app.route('/logout',methods=['POST'] )
 def logout():
@@ -184,7 +205,7 @@ def logout():
     resp.delete_cookie('id')
     return resp
 
-def response(code,message,data = None):
+def response(code,message,data =None):
     res={'code':code,'message':message,'data':{}}
     if data is not None:
         if hasattr(data,'__dict__'):

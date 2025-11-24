@@ -57,22 +57,20 @@ export default {
           'Content-Type': 'application/json',
         }
       }).then((res) => {
-        console.log(res)
         if (res.status!==200) {
           this.$Message.error('API error+('+res.status+')')
         }
         if (res.data.code===999){
           this.$Message.error(res.data.message)
+          console.log("went through")
           this.$router.push('./login')
           return
         }
         if (res.data.code===0){
           this.$Message.success(res.data.message)
           this.$router.push('/students')
-          return;
         }else{
           this.$Message.error(res.data.message)
-          return;
         }
       }).catch((err)=>{
         this.$Message.error('internet error('+err+')')

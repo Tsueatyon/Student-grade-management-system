@@ -143,7 +143,7 @@ export default {
           this.$router.push('/login')
           return
         }
-        this.$Message.success(res.data.messages)
+        this.$Message.success(res.data.message)
         this.$router.push('/login')
       }).catch((err)=>{
         this.$Message.error('internet error('+err+')')
