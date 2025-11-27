@@ -57,7 +57,7 @@ jobs:
             pkill -f server.py || true
             nohup python server.py > flask.log 2>&1 &
             echo "Flask restarted at $(date)"
-
+            sleep 2
       # 4. Success message
       - name: Deploy Success
         run: echo "Deploy completed successfully!"
