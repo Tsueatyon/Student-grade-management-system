@@ -1,7 +1,7 @@
 # Project1
 1, Student Grade Management System
 
-http://3.94.117.159:5174/#/
+http://54.172.200.184/
 
 Username:admin
 
