@@ -1,0 +1,59 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - master        # ← change to your default branch if different
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Build Vue frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build Vue app (production)
+        run: npm run build
+
+      # 2. Deploy to EC2 via SSH
+      - name: Deploy to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}          # your public IP
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}        # private key (see step 2)
+          port: 22
+          source: "dist/*"
+          target: "/home/ec2-user/dist/"
+          strip_components: 1
+          overwrite: true
+
+      # 3. Restart Flask (or just touch server.py to reload)
+      - name: Restart Flask Backend
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            cd /home/ec2-user/server
+            source venv/bin/activate
+            pkill -f server.py || true
+            nohup python server.py > flask.log 2>&1 &
+            echo "Flask restarted at $(date)"
+
+      # 4. Success message
+      - name: Deploy Success
+        run: echo "Deploy completed successfully!"
