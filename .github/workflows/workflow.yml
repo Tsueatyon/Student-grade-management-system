@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
 
       # 1. Build Vue frontend
       - name: Setup Node.js
@@ -19,12 +20,15 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: web1/package-lock.json
 
       - name: Install frontend dependencies
         run: npm ci
+        working-directory: web1
 
       - name: Build Vue app (production)
         run: npm run build
+        working-directory: web1
 
       # 2. Deploy to EC2 via SSH
       - name: Deploy to Server
@@ -34,7 +38,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}        # private key (see step 2)
           port: 22
-          source: "dist/*"
+          source: "web1/dist/*"
           target: "/home/ec2-user/dist/"
           strip_components: 1
           overwrite: true
