@@ -1,6 +1,6 @@
 # Student Grade Management System
 
-A full-stack web application for managing student grades and teacher accounts, built with modern technologies and deployed on AWS. This project demonstrates proficiency in frontend development, backend API design, database management, and cloud deployment.
+A full-stack web application for managing student grades and teacher accounts, built with Vue.js + Flask + Mysql and deployed on AWS.
 
 ## 🚀 Live Demo
 
@@ -9,18 +9,6 @@ A full-stack web application for managing student grades and teacher accounts, b
 **Demo Credentials:**
 - Username: `admin`
 - Password: `admin#1234`
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Key Features & Implementation](#key-features--implementation)
-- [API Endpoints](#api-endpoints)
-- [Installation & Setup](#installation--setup)
-- [Deployment](#deployment)
-- [Project Highlights](#project-highlights)
 
 ## Overview
 
@@ -47,12 +35,6 @@ The Student Grade Management System is a comprehensive web application designed 
 - Edit student information and grades
 - Delete student records
 - Track grades across multiple subjects (Math, English, Physics)
-
-### 🎨 User Interface
-- Modern, responsive design using View UI Plus
-- Intuitive navigation with Vue Router
-- Real-time data updates
-- User-friendly forms and validation
 
 ## Technology Stack
 
@@ -141,23 +123,6 @@ pythonProject1/
 - Nginx reverse proxy setup
 - AWS EC2 deployment
 
-## API Endpoints
-
-### Authentication
-- `POST /login` - User authentication
-- `POST /logout` - Session termination
-
-### Teacher Management
-- `GET /teacher_lists` - Retrieve all teachers
-- `POST /teacher_add` - Create new teacher account
-- `POST /teacher_edit` - Update teacher information
-- `POST /teacher_delete` - Remove teacher account
-
-### Student Management
-- `GET /student_lists` - Retrieve all students with grades
-- `POST /student_add` - Create new student record
-- `POST /student_edit` - Update student information and grades
-- `POST /student_delete` - Remove student record
 
 ## Installation & Setup
 
@@ -257,9 +222,6 @@ The application is deployed on AWS with the following architecture:
 - Code organization and modularity
 - Security considerations (SQL injection prevention, CORS)
 
----
-
-**Note**: This project demonstrates practical application of full-stack development skills and is suitable for portfolio presentation in job applications.
 
 
 <img width="1282" height="937" alt="image" src="https://github.com/user-attachments/assets/7a2a8fa4-b41f-4716-9d4b-bd4471aa8832" />
